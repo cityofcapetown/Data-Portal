@@ -20,10 +20,10 @@ RUN git clone 'https://github.com/data-govt-nz/ckanext-security.git' /tmp/ckanex
   python setup.py install && \
   rm -rf /tmp/ckanext-security
 
-# Cloud Connector extension
-RUN git clone 'https://github.com/DataShades/ckanext-cloudconnector.git' /tmp/ckanext-cloudconnector && \
-  cd /tmp/ckanext-cloudconnector && \
-  python setup.py install && \
-  rm -rf /tmp/ckanext-cloudconnector
+# S3 filestore extension
+RUN git clone 'https://github.com/okfn/ckanext-s3filestore' /tmp/ckanext-s3filestore && \
+    cd /tmp/ckanext-s3filestore && \
+    python setup.py install && \
+    rm -rf /tmp/ckanext-s3filestore
 
 USER ckan
