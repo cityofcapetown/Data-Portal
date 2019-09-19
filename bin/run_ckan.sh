@@ -12,7 +12,7 @@ docker run --name ckan-datapusher --network ckan --restart always -d -p 8800:880
 
 docker run --name db --network ckan --restart always -d -v /tmp/ckan-postgresql-data:/var/lib/postgresql/data -e DS_RO_PASS=ckan_ro ckan/postgresql
 
-docker run --name ckan-minio --network ckan --restart always -d -e "MINIO_ACCESS_KEY=cctAIOSFODNN7EXAMPLE" -e "MINIO_SECRET_KEY=cctlrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" minio/minio server /tmp/ckan-minio_data
+docker run --name ckan-minio --network ckan --restart always -d -p 9000:9000 -e "MINIO_ACCESS_KEY=cctAIOSFODNN7EXAMPLE" -e "MINIO_SECRET_KEY=cctlrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" minio/minio server /tmp/ckan-minio_data
 
 # Moving config across
 mkdir -p /tmp/ckan-config
