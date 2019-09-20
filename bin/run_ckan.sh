@@ -9,7 +9,7 @@ DATA_DIR=${1:-$tmpdir}
 MINIO_ACCESS_KEY=${2:-$default_minio_access}
 MINIO_SECRET_KEY=${3:-$default_minio_secret}
 CKAN_PORT=${4:-$default_port}
-default_hostname="http://localhost:$CKAN_PORT"
+default_hostname="http://192.168.2.1:$CKAN_PORT"
 CKAN_HOSTNAME=${5:-$default_hostname}
 
 echo Installing everything to "$DATA_DIR"
