@@ -27,7 +27,7 @@ RUN . /usr/lib/ckan/venv/bin/activate && pip install git+https://github.com/data
 RUN . /usr/lib/ckan/venv/bin/activate && \ 
     git clone -b v0.1.1 --single-branch --depth 1 'https://github.com/okfn/ckanext-s3filestore' /tmp/ckanext-s3filestore && \
     cd /tmp/ckanext-s3filestore && \
-    pip -r requirements.txt && \
+    pip install -r requirements.txt && \
     python setup.py install && \
     rm -rf /tmp/ckanext-s3filestore
 
