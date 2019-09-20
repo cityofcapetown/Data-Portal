@@ -4,6 +4,9 @@ MAINTAINER Gordon Inggs, Riaz Arbi, Derek Strong
 
 USER root
 
+# Locking CKAN version
+RUN pip install -e 'git+https://github.com/ckan/ckan.git@ckan-2.7.6#egg=ckan'
+
 # Private Datasets extension
 RUN pip install ckanext-privatedatasets
 
