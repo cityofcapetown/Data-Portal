@@ -1,15 +1,8 @@
-FROM ckan/ckan:latest
+FROM ckan/ckan:latest@sha256:a8b44866392ec6a97a97940d025ceb2ee4f1835e7d4b909f50ddbb4b698af72e
 
 MAINTAINER Gordon Inggs, Riaz Arbi, Derek Strong
 
 USER root
-
-# Locking CKAN version to 2.7.6
-RUN . /usr/lib/ckan/venv/bin/activate && \
-    git clone -b ckan-2.7.6 --single-branch --depth 1 'https://github.com/ckan/ckan.git' /tmp/ckan && \
-    cd /tmp/ckan && \
-    python setup.py install && \
-    cd - && rm -rf /tmp/ckan
 
 # Private Datasets extension
 RUN pip install ckanext-privatedatasets
