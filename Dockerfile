@@ -5,7 +5,7 @@ MAINTAINER Gordon Inggs, Riaz Arbi, Derek Strong
 USER root
 
 # Private Datasets extension
-RUN pip install ckanext-privatedatasets
+RUN . /usr/lib/ckan/venv/bin/activate && pip install ckanext-privatedatasets
 
 ## Resource authorisation extension
 RUN . /usr/lib/ckan/venv/bin/activate && pip install git+https://github.com/etri-odp/ckanext-resourceauthorizer.git
