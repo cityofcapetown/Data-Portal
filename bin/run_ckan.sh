@@ -48,7 +48,7 @@ docker run --name ckan-redis --network ckan --restart always -d redis:latest
 
 docker run --name ckan-solr --network ckan --restart always -d -v $DATA_DIR/solr-data:/opt/solr/server/solr/ckan/data ckan/solr
 
-docker run --name ckan-datapusher --network ckan --restart always -d -p 8800:8800 -v $DATA_DIR/ckan-datapusher-data/datapusher_settings.py:/usr/src/app/deployment/datapusher_settings.py clementmouchet/datapusher
+docker run --name ckan-datapusher --network ckan --restart always -d -e SSL_VERIFY=False -p 8800:8800 -v $DATA_DIR/ckan-datapusher-data/datapusher_settings.py:/usr/src/app/deployment/datapusher_settings.py clementmouchet/datapusher
 
 docker run --name db --network ckan --restart always -d -v $DATA_DIR/ckan-db-data:/var/lib/postgresql/data ckan/postgresql
 
