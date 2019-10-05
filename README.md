@@ -18,6 +18,11 @@ Also, the work done by OpenUp on [SA's National Treasury CKAN](https://github.co
 Working notes on what has to be done to prepare this install for production deployment:
 * Change location of all mounted volumes to somewhere other than `/tmp`.
 * Change Access and Secret key for Minio when spinning up container, and also in the CKAN config file.
-* Setup an nginx SSL/TLS termination point:
-  * Generate self-signed SSL/TLS cert (`openssl req -x509 -newkey rsa:4096 -keyout ckan_key.pem -out ckan_cert.pem -days 3650 -nodes`).
-  * Set up proxy rules to pass traffic from port `443` to port `8001` (the one that CKAN is on). 
+* Setup an Nginx SSL/TLS termination point:
+  * ~~generate self-signed SSL/TLS cert (`openssl req -x509 -newkey rsa:4096 -keyout ckan_key.pem -out ckan_cert.pem -days 3650 -nodes`).~~
+  * use [certbot](https://certbot.eff.org/lets-encrypt) to generate properly signed certificates for our subdomains (you'll need to register these somehow): 
+    * `sudo certbot certonly --standalone -d <FQDN e.g. data.demo.com>`
+    * Creates certificate at `/etc/letsencrypt/live/<FQDN>/cert.pem`
+    * Creates key at `/etc/letsencrypt/live/<FQDN>/privkey.pem` 
+  * Set up NGINX config with proxy rules to pass traffic from port `443` to port `5000` (the one that CKAN is on). See config directory for example config.
+  * Create the NGINX reverse proxy: `docker run -d --restart always -v <path to letsencrypt certs e.g. /etc/letsencrypt>:/etc/nginx/certs:z -v <Path to NGINX config>:/etc/nginx/conf.d/default.conf --network ckan --name ckan-proxy -p 443:443 -p 80:80 nginx`
