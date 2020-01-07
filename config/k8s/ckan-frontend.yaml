@@ -1,0 +1,101 @@
+# CKAN Frontend 
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ckan-data
+  namespace: ckan
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ckan-frontend
+  namespace: ckan
+spec:
+  selector:
+    matchLabels:
+      run: ckan-frontend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: ckan-frontend
+    spec:
+      containers:
+      - name: ckan-frontend
+        image: cityofcapetown/data-portal@sha256:4076055d86ae2c5d010737ef57ee9844ff084801ec06d9612e5a190fd7a4d0e7 
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - mountPath: "/var/lib/ckan"
+          name: ckan-data
+        - mountPath: "/etc/ckan/production.ini"
+          subPath: "production.ini"
+          name: production-config
+        - mountPath: "/etc/ckan/who.ini"
+          subPath: "who.ini"
+          name: who-config
+        envFrom:
+        - secretRef:
+            name: ckan-secret
+        env:
+        - name: "CKAN_SITE_URL"
+          value: "https://ds3.capetown.gov.za/data-catalogue"
+        - name: "CKAN_SOLR_URL"
+          value: "http://ckan-solr:8983/solr/ckan"
+        - name: "CKAN_REDIS_URL"
+          value: "redis://ckan-redis:6379/1"
+        - name: "CKAN_DATAPUSHER_URL"
+          value: "http://ckan-datapusher:8800/"
+        - name: "CKAN_DATAPUSHER_CALLBACK_URL_BASE"
+          value: "http://ckan:5000/"
+      volumes:
+        - name: production-config
+          configMap:
+            name: production-ini
+        - name: who-config
+          configMap:
+            name: who-ini
+        - name: ckan-data
+          persistentVolumeClaim:
+            claimName: ckan-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ckan-frontend
+  namespace: ckan
+  labels:
+    run: ckan-frontend
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    run: ckan-frontend
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ckan-frontend
+  namespace: ckan 
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.frontend.rule.type: PathPrefix
+spec:
+  rules:
+  - host:  
+    http:
+      paths:
+      - path: /data-catalogue
+        backend:
+          serviceName: ckan-frontend
+          servicePort: 80

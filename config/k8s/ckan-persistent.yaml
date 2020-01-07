@@ -1,0 +1,252 @@
+# Redis
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ckan-redis
+  namespace: ckan
+spec:
+  selector:
+    matchLabels:
+      run: ckan-redis
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: ckan-redis
+    spec:
+      containers:
+      - name: ckan-redis
+        image: redis 
+        ports:
+        - containerPort: 6379 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ckan-redis
+  namespace: ckan
+  labels:
+    run: ckan-redis
+spec:
+  ports:
+  - port: 6379 
+    protocol: TCP
+  selector:
+    run: ckan-redis
+---
+# Solr
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ckan-solr-data
+  namespace: ckan
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ckan-solr
+  namespace: ckan
+spec:
+  selector:
+    matchLabels:
+      run: ckan-solr
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: ckan-solr
+    spec:
+      containers:
+      - name: ckan-solr
+        image: ckan/solr
+        ports:
+        - containerPort: 8983 
+        volumeMounts:
+        - mountPath: "/opt/solr/server/solr/ckan/data"
+          name: ckan-solr-data
+      volumes:
+        - name: ckan-solr-data
+          persistentVolumeClaim:
+            claimName: ckan-solr-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ckan-solr
+  namespace: ckan
+  labels:
+    run: ckan-solr
+spec:
+  ports:
+  - port: 8983
+    protocol: TCP
+  selector:
+    run: ckan-solr
+---
+# CKAN DB
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ckan-db-data
+  namespace: ckan
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ckan-db
+  namespace: ckan
+spec:
+  selector:
+    matchLabels:
+      run: ckan-db
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: ckan-db
+    spec:
+      containers:
+      - name: ckan-db
+        image: ckan/postgresql
+        ports:
+        - containerPort: 5432 
+        volumeMounts:
+        - mountPath: "/var/lib/postgresql/data"
+          name: ckan-db-data
+      volumes:
+        - name: ckan-db-data
+          persistentVolumeClaim:
+            claimName: ckan-db-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  namespace: ckan
+  labels:
+    run: ckan-db
+spec:
+  ports:
+  - port: 5432
+    protocol: TCP
+  selector:
+    run: ckan-db
+---
+# CKAN Datastore DB
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ckan-datastore-db-data
+  namespace: ckan
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ckan-datastore-db
+  namespace: ckan
+spec:
+  selector:
+    matchLabels:
+      run: ckan-datastore-db
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: ckan-datastore-db
+    spec:
+      containers:
+      - name: ckan-datastore-db
+        image: ckan/postgresql
+        ports:
+        - containerPort: 5432 
+        volumeMounts:
+        - mountPath: "/var/lib/postgresql/data"
+          name: ckan-datastore-db-data
+      volumes:
+        - name: ckan-datastore-db-data
+          persistentVolumeClaim:
+            claimName: ckan-db-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ckan-datastore-db
+  namespace: ckan
+  labels:
+    run: ckan-datastore-db
+spec:
+  ports:
+  - port: 5432
+    protocol: TCP
+  selector:
+    run: ckan-datastore-db
+---
+# CKAN Datapusher
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ckan-datapusher
+  namespace: ckan
+spec:
+  selector:
+    matchLabels:
+      run: ckan-datapusher
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: ckan-datapusher
+    spec:
+      containers:
+      - name: ckan-datapusher
+        image: cityofcapetown/ckan-datapusher
+        ports:
+        - containerPort: 8800
+        volumeMounts:
+        - mountPath: "/usr/src/app/deployment"
+          name: ckan-datapusher-config
+      volumes:
+        - name: ckan-datapusher-config
+          configMap:
+            name: datapusher-settings-py
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ckan-datapusher
+  namespace: ckan
+  labels:
+    run: ckan-datapusher
+spec:
+  ports:
+  - port: 8800
+    protocol: TCP
+  selector:
+    run: ckan-datapusher
+---
