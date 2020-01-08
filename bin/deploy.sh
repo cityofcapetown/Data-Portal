@@ -22,7 +22,7 @@ MINIO_SECRET_KEY=${4:-$default_minio_secret}
 
 # These will be passed in as env variables to the CKAN frontend
 kubectl create secret generic ckan-secret  --namespace ckan \
-	--from-literal="CKAN_SQLALCHEMY_URL"="postgresql://ckan:$POSTGRES_PASSWORD@ckan-db/ckan" \
+	--from-literal="CKAN_SQLALCHEMY_URL"="postgresql://ckan:$POSTGRES_PASSWORD@db/ckan" \
 	--from-literal="CKAN_DATASTORE_WRITE_URL"="postgresql://ckan:$POSTGRES_PASSWORD@ckan-datastore-db/datastore" \
 	--from-literal="CKAN_DATASTORE_READ_URL"="postgresql://datastore_ro:$DATASTORE_RO_PASSWORD@ckan-datastore-db/datastore" \
 	--from-literal="POSTGRES_PASSWORD"="$POSTGRES_PASSWORD" \
@@ -33,14 +33,21 @@ kubectl create secret generic ckan-secret  --namespace ckan \
 # Creating persistent pods
 kubectl apply -f config/k8s/ckan-persistent.yaml
 
-# Creating frontend pods
-kubectl apply -f config/k8s/ckan-frontend.yaml
-
-# Setting datastore permissions
-frontend_pod=$(kubectl get pod --namespace ckan | grep ckan-frontend | cut -d " " -f1)
+# Temporary setup pod
+# Mostly for setting datastore permissions
+kubectl apply -f config/k8s/ckan-permission.yaml
 datastore_pod=$(kubectl get pod --namespace ckan | grep ckan-datastore-db | cut -d " " -f1)
-kubectl exec "$frontend_pod" -c ckan-frontend --namespace ckan \ 
+
+while [[ $(kubectl get pods ckan-datastore --namespace ckan -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do echo "waiting for temporary pod" && sleep 1; done
+while [[ $(kubectl get pods ckan-db --namespace ckan -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do echo "waiting for temporary pod" && sleep 1; done
+while [[ $(kubectl get pods ckan-permission-setup --namespace ckan -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do echo "waiting for temporary pod" && sleep 1; done
+
+kubectl exec ckan-permission-setup -c ckan-permission-setup --namespace ckan \ 
 	-- /usr/local/bin/ckan-paster --plugin=ckan datastore set-permissions -c /etc/ckan/production.ini \
 	| kubectl exec "$datastore_pod" -i -c ckan-datastore-db --namespace ckan \
 	-- psql -U ckan
+kubectl delete -f config/k8s/ckan-permission.yaml
+
+# Creating frontend pods
+kubectl apply -f config/k8s/ckan-frontend.yaml
 

@@ -54,6 +54,10 @@ spec:
           value: "redis://ckan-redis:6379/1"
         - name: "CKAN_DATAPUSHER_URL"
           value: "http://ckan-datapusher:8800/"
+        #args:
+        #- "ckan-paster"
+        #- "serve"
+        #- "/etc/ckan/production.ini"
       volumes:
         - name: production-config
           configMap:
