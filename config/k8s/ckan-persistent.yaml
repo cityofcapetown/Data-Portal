@@ -164,7 +164,7 @@ metadata:
   name: ckan-datastore-db-data
   namespace: ckan
   annotations:
-    pv.beta.kubernetes.io/gid: "1234"
+    pv.beta.kubernetes.io/gid: "5678"
 spec:
   accessModes:
     - ReadWriteOnce
@@ -188,7 +188,7 @@ spec:
       labels:
         run: ckan-datastore-db
       annotations:
-        pv.beta.kubernetes.io/gid: "1234"
+        pv.beta.kubernetes.io/gid: "5678"
     spec:
       containers:
       - name: ckan-datastore-db
@@ -204,7 +204,7 @@ spec:
       volumes:
         - name: ckan-datastore-db-data
           persistentVolumeClaim:
-            claimName: ckan-db-data
+            claimName: ckan-datastore-db-data
 ---
 apiVersion: v1
 kind: Service
