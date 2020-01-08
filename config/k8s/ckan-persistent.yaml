@@ -99,6 +99,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: ckan-db-data
   namespace: ckan
+  annotations:
+    pv.beta.kubernetes.io/gid: "1234"
 spec:
   accessModes:
     - ReadWriteOnce
@@ -121,6 +123,8 @@ spec:
     metadata:
       labels:
         run: ckan-db
+      annotations:
+        pv.beta.kubernetes.io/gid: "1234"
     spec:
       containers:
       - name: ckan-db
@@ -130,6 +134,9 @@ spec:
         volumeMounts:
         - mountPath: "/var/lib/postgresql/data"
           name: ckan-db-data
+        envFrom:
+        - secretRef:
+            name: ckan-secret
       volumes:
         - name: ckan-db-data
           persistentVolumeClaim:
@@ -156,6 +163,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: ckan-datastore-db-data
   namespace: ckan
+  annotations:
+    pv.beta.kubernetes.io/gid: "1234"
 spec:
   accessModes:
     - ReadWriteOnce
@@ -178,6 +187,8 @@ spec:
     metadata:
       labels:
         run: ckan-datastore-db
+      annotations:
+        pv.beta.kubernetes.io/gid: "1234"
     spec:
       containers:
       - name: ckan-datastore-db
@@ -187,6 +198,9 @@ spec:
         volumeMounts:
         - mountPath: "/var/lib/postgresql/data"
           name: ckan-datastore-db-data
+        envFrom:
+        - secretRef:
+            name: ckan-secret
       volumes:
         - name: ckan-datastore-db-data
           persistentVolumeClaim:

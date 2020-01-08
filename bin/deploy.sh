@@ -27,11 +27,20 @@ kubectl create secret generic ckan-secret  --namespace ckan \
 	--from-literal="CKAN_DATASTORE_READ_URL"="postgresql://datastore_ro:$DATASTORE_RO_PASSWORD@ckan-datastore-db/datastore" \
 	--from-literal="POSTGRES_PASSWORD"="$POSTGRES_PASSWORD" \
 	--from-literal="DS_RO_PASS"="$DATASTORE_RO_PASSWORD" \
-	--from-literal="CKAN__CKANEXT__S3FILESTORE__AWS_ACCESS_KEY_ID"="$MINIO_ACCESS_KEY" \
-	--from-literal="CKAN__CKANEXT__S3FILESTORE__AWS_SECRET_ACCESS_KEY"="$MINIO_SECRET_KEY"
+	--from-literal="CKAN___CKANEXT__S3FILESTORE__AWS_ACCESS_KEY_ID"="$MINIO_ACCESS_KEY" \
+	--from-literal="CKAN___CKANEXT__S3FILESTORE__AWS_SECRET_ACCESS_KEY"="$MINIO_SECRET_KEY"
 
 # Creating persistent pods
 kubectl apply -f config/k8s/ckan-persistent.yaml
 
 # Creating frontend pods
 kubectl apply -f config/k8s/ckan-frontend.yaml
+
+# Setting datastore permissions
+frontend_pod=$(kubectl get pod --namespace ckan | grep ckan-frontend | cut -d " " -f1)
+datastore_pod=$(kubectl get pod --namespace ckan | grep ckan-datastore-db | cut -d " " -f1)
+kubectl exec "$frontend_pod" -c ckan-frontend --namespace ckan \ 
+	-- /usr/local/bin/ckan-paster --plugin=ckan datastore set-permissions -c /etc/ckan/production.ini \
+	| kubectl exec "$datastore_pod" -i -c ckan-datastore-db --namespace ckan \
+	-- psql -U ckan
+
