@@ -51,3 +51,8 @@ kubectl delete -f config/k8s/ckan-permission.yaml
 # Creating frontend pods
 kubectl apply -f config/k8s/ckan-frontend.yaml
 
+# Rebuilding Solr Index (just in-case)
+frontend_pod=$(kubectl get pod --namespace ckan | grep ckan-frontend | cut -d " " -f1)
+kubectl exec "$frontend_pod" -c ckan-frontend -i --namespace ckan \
+	-- /usr/local/bin/ckan-paster --plugin=ckan search-index rebuild --config=/etc/ckan/production.ini
+
