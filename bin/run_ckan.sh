@@ -78,7 +78,7 @@ docker run --name ckan \
 	   -v $DATA_DIR/ckan-storage:/var/lib/ckan \
 	   -p $CKAN_PORT:5000 \
 	   -it \
-	   cityofcapetown/data-portal
+	   cityofcapetown/data-portal@sha256:4076055d86ae2c5d010737ef57ee9844ff084801ec06d9612e5a190fd7a4d0e7
 
 # Setting permissions
 docker exec ckan /usr/local/bin/ckan-paster --plugin=ckan datastore set-permissions -c /etc/ckan/production.ini | docker exec -i ckan-datastore-db psql -U ckan

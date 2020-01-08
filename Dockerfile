@@ -1,4 +1,4 @@
-FROM ckan/ckan:latest@sha256:a8b44866392ec6a97a97940d025ceb2ee4f1835e7d4b909f50ddbb4b698af72e
+FROM ckan/ckan:latest
 
 MAINTAINER Gordon Inggs, Riaz Arbi, Derek Strong
 
