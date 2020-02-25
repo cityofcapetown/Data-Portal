@@ -22,7 +22,8 @@ RUN . /usr/lib/ckan/venv/bin/activate && pip install git+https://github.com/data
 RUN . /usr/lib/ckan/venv/bin/activate && \
     pip install git+https://github.com/okfn/ckanext-s3filestore@v0.1.1 boto3>=1.4.4 ckantoolkit
 
-# datagovsg-s3-resources
-#RUN . /usr/lib/ckan/venv/bin/activate && pip install git+https://github.com/datagovsg/ckanext-s3-resources.git slugify boto3 flask-debugtoolbar 
+# CCT Metadata extension
+RUN . /usr/lib/ckan/venv/bin/activate && \
+    pip install  git+https://github.com/cityofcapetown/ckanext-cct_metadata.git
 
 USER ckan
