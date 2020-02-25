@@ -1,16 +1,8 @@
-FROM ckan/ckan:latest
+FROM ckan/ckan@sha256:a8b44866392ec6a97a97940d025ceb2ee4f1835e7d4b909f50ddbb4b698af72e
 
 MAINTAINER Gordon Inggs, Riaz Arbi, Derek Strong
 
 USER root
-
-# Explicitly setting CKAN version to 2.8.3
-RUN . /usr/lib/ckan/venv/bin/activate && \
-    pip install -e 'git+https://github.com/ckan/ckan.git@ckan-2.8.3#egg=ckan' && \
-    pip install -r /usr/lib/ckan/venv/src/ckan/requirements.txt
-
-# Fixing path issue
-RUN chown ckan /usr/lib/ckan/venv/local/lib/python2.7/site-packages/ckan/public/base/i18n
 
 # Private Datasets extension
 RUN . /usr/lib/ckan/venv/bin/activate && pip install ckanext-privatedatasets
