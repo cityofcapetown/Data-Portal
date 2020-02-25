@@ -5,7 +5,9 @@ MAINTAINER Gordon Inggs, Riaz Arbi, Derek Strong
 USER root
 
 # Explicitly setting CKAN version to 2.8.3
-RUN . /usr/lib/ckan/venv/bin/activate && pip install ckan==2.8.3
+RUN . /usr/lib/ckan/venv/bin/activate && \
+    pip install -r https://raw.githubusercontent.com/ckan/ckan/ckan-2.8.3/requirements.txt && \
+    pip install ckan==2.8.3
 
 # Private Datasets extension
 RUN . /usr/lib/ckan/venv/bin/activate && pip install ckanext-privatedatasets
