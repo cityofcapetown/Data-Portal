@@ -7,7 +7,7 @@ metadata:
 spec:
   containers:
   - name: ckan-permission-setup 
-    image: cityofcapetown/data-portal 
+    image: cityofcapetown/data-portal@sha256:dc2f5a6d18d123c5bcc7eda746a5f97ca56b6acc7dc935b427b705977eeb368b
     volumeMounts:
     - mountPath: "/etc/ckan/production.ini"
       subPath: "production.ini"
@@ -27,11 +27,10 @@ spec:
       value: "redis://ckan-redis:6379/1"
     - name: "CKAN_DATAPUSHER_URL"
       value: "http://ckan-datapusher:8800/"
+    command:
+    - "cat"
     args:
-    - "printenv"
-    #- "ckan-paster"
-    #- "serve"
-    #- "/etc/ckan/production.ini"
+    - "/dev/random"
   restartPolicy: Never
   volumes:
     - name: production-config
