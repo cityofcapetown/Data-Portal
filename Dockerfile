@@ -6,8 +6,11 @@ USER root
 
 # Explicitly setting CKAN version to 2.8.3
 RUN . /usr/lib/ckan/venv/bin/activate && \
-    pip install -r https://raw.githubusercontent.com/ckan/ckan/ckan-2.8.3/requirements.txt && \
-    pip install ckan==2.8.3
+    pip install -e 'git+https://github.com/ckan/ckan.git@ckan-2.8.3#egg=ckan' && \
+    pip install -r /usr/lib/ckan/venv/src/ckan/requirements.txt
+
+# Fixing path issue
+RUN chown ckan /usr/lib/ckan/venv/local/lib/python2.7/site-packages/ckan/public/base/i18n
 
 # Private Datasets extension
 RUN . /usr/lib/ckan/venv/bin/activate && pip install ckanext-privatedatasets
