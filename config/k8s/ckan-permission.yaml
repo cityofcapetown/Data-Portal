@@ -7,7 +7,7 @@ metadata:
 spec:
   containers:
   - name: ckan-permission-setup 
-    image: cityofcapetown/data-portal@sha256:dc2f5a6d18d123c5bcc7eda746a5f97ca56b6acc7dc935b427b705977eeb368b
+    image: cityofcapetown/data-portal
     volumeMounts:
     - mountPath: "/etc/ckan/production.ini"
       subPath: "production.ini"
