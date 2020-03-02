@@ -1,4 +1,4 @@
-FROM ckan/ckan@sha256:a8b44866392ec6a97a97940d025ceb2ee4f1835e7d4b909f50ddbb4b698af72e
+FROM ckan/ckan@sha256:de7aea313360702f579b934fb9f4b0ad9aef15ba4e361344fbecc07b38f031f7
 
 MAINTAINER Gordon Inggs, Riaz Arbi, Derek Strong
 
