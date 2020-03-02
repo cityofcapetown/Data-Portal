@@ -40,7 +40,7 @@ RUN mkdir -p $CKAN_VENV $CKAN_CONFIG $CKAN_STORAGE_PATH && \
     ln -s $CKAN_VENV/bin/paster /usr/local/bin/ckan-paster
 
 # Setup CKAN
-RUN git clone https://github.com/ckan/ckan.git@2.8.3 $CKAN_VENV/src/ckan/
+RUN git clone https://github.com/ckan/ckan.git $CKAN_VENV/src/ckan/
 # Locking the version to 2.8.3
 RUN cd $CKAN_VENV/src/ckan/ && git checkout tags/ckan-2.8.3
 RUN ckan-pip install -U pip && \
@@ -73,7 +73,7 @@ RUN ckan-pip install git+https://github.com/okfn/ckanext-s3filestore@v0.1.1 boto
 RUN ckan-pip install git+https://github.com/okfn/ckanext-collaborators.git@0.0.4
 
 # CCT Metadata extension
-RUN ckan-pip install  git+https://github.com/cityofcapetown/ckanext-cct_metadata.git
+RUN ckan-pip install git+https://github.com/cityofcapetown/ckanext-cct_metadata.git
 
 # And back to getting things up
 ENTRYPOINT ["/ckan-entrypoint.sh"]
