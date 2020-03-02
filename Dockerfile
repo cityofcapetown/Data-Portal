@@ -22,6 +22,10 @@ RUN . /usr/lib/ckan/venv/bin/activate && pip install git+https://github.com/data
 RUN . /usr/lib/ckan/venv/bin/activate && \
     pip install git+https://github.com/okfn/ckanext-s3filestore@v0.1.1 boto3>=1.4.4 ckantoolkit
 
+# Collaborators extension
+RUN . /usr/lib/ckan/venv/bin/activate && \
+    pip install git+https://github.com/okfn/ckanext-collaborators.git@0.0.4
+
 # CCT Metadata extension
 RUN . /usr/lib/ckan/venv/bin/activate && \
     pip install  git+https://github.com/cityofcapetown/ckanext-cct_metadata.git
