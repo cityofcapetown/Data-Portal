@@ -26,3 +26,9 @@ Working notes on what has to be done to prepare this install for production depl
     * Creates key at `/etc/letsencrypt/live/<FQDN>/privkey.pem` 
   * Set up NGINX config with proxy rules to pass traffic from port `443` to port `5000` (the one that CKAN is on). See config directory for example config.
   * Create the NGINX reverse proxy: `docker run -d --restart always -v <path to letsencrypt certs e.g. /etc/letsencrypt>:/etc/nginx/certs:z -v <Path to NGINX config>:/etc/nginx/conf.d/default.conf --network ckan --name ckan-proxy -p 443:443 -p 80:80 nginx`
+
+## Kubernetes
+1. Use [deploy script](./bin/deploy.sh) from the this repo, i.e. `./bin/deploy.sh`:
+  ```bash
+  ./bin/deploy.sh <POSTGRES DB Password> <Datastore DB Read only Password> <Minio/S3 Access Key> <Minio/S3 Secret Key>
+  ```
