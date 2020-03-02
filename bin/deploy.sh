@@ -57,6 +57,12 @@ kubectl exec "$ckan_permission_pod" -c ckan-permission-setup --namespace ckan \
 	-- /usr/local/bin/ckan-paster --plugin=ckan datastore set-permissions -c /etc/ckan/production.ini \
 	| kubectl exec "$datastore_pod" -i -c ckan-datastore-db --namespace ckan \
 	-- psql -U ckan
+
+# Generate collaborator DB tables
+kubectl exec "$ckan_permission_pod" -c ckan-permission-setup --namespace ckan \
+	-- /usr/local/bin/ckan-paster --plugin=ckanext-collaborators collaborators init-db -c /etc/ckan/production.ini
+
+# Cleaning up permissions pod
 kubectl delete -f config/k8s/ckan-permission.yaml
 
 # Creating frontend pods
