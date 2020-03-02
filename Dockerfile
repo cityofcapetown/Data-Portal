@@ -40,9 +40,9 @@ RUN mkdir -p $CKAN_VENV $CKAN_CONFIG $CKAN_STORAGE_PATH && \
     ln -s $CKAN_VENV/bin/paster /usr/local/bin/ckan-paster
 
 # Setup CKAN
-git clone https://github.com/ckan/ckan.git@2.8.3 $CKAN_VENV/src/ckan/
+RUN git clone https://github.com/ckan/ckan.git@2.8.3 $CKAN_VENV/src/ckan/
 # Locking the version to 2.8.3
-cd $CKAN_VENV/src/ckan/ && git checkout tags/ckan-2.8.3
+RUN cd $CKAN_VENV/src/ckan/ && git checkout tags/ckan-2.8.3
 RUN ckan-pip install -U pip && \
     ckan-pip install --upgrade --no-cache-dir -r $CKAN_VENV/src/ckan/requirement-setuptools.txt && \
     ckan-pip install --upgrade --no-cache-dir -r $CKAN_VENV/src/ckan/requirements.txt && \
