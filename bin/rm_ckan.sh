@@ -6,6 +6,7 @@ docker rm -f ckan-datapusher
 docker rm -f ckan-minio
 docker rm -f db
 docker rm -f ckan-datastore-db
+docker rm -f ckan-proxy
 docker rm -f ckan
 
 docker network rm ckan
