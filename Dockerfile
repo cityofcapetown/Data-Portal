@@ -64,13 +64,16 @@ RUN ckan-pip install -U pip && \
 #    ckan-pip install git+https://github.com/ckan/ckanext-scheming.git
 
 ## Extra security extension
-#RUN ckan-pip install git+https://github.com/data-govt-nz/ckanext-security.git Beaker==1.6.4
+RUN ckan-pip install git+https://github.com/data-govt-nz/ckanext-security.git Beaker==1.6.4
 
 # S3 filestore extension
 RUN ckan-pip install git+https://github.com/okfn/ckanext-s3filestore boto3>=1.4.4 ckantoolkit
 
 # Collaborators extension
 RUN ckan-pip install git+https://github.com/okfn/ckanext-collaborators.git
+
+# Hierarchy extension
+RUN ckan-pip install git+https://github.com/ckan/ckanext-hierarchy.git
 
 # CCT Metadata extension
 #RUN ckan-pip install git+https://github.com/cityofcapetown/ckanext-cct_metadata.git
