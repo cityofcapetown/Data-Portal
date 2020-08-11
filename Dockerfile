@@ -42,7 +42,7 @@ RUN mkdir -p $CKAN_VENV $CKAN_CONFIG $CKAN_STORAGE_PATH && \
 # Setup CKAN
 RUN git clone https://github.com/ckan/ckan.git $CKAN_VENV/src/ckan/
 # Locking the version to 2.8.3
-RUN cd $CKAN_VENV/src/ckan/ && git checkout tags/ckan-2.8.4
+RUN cd $CKAN_VENV/src/ckan/ && git checkout tags/ckan-2.9.0
 RUN ckan-pip install -U pip && \
     ckan-pip install --upgrade --no-cache-dir -r $CKAN_VENV/src/ckan/requirement-setuptools.txt && \
     ckan-pip install --upgrade --no-cache-dir -r $CKAN_VENV/src/ckan/requirements.txt && \
@@ -70,7 +70,7 @@ RUN ckan-pip install git+https://github.com/data-govt-nz/ckanext-security.git Be
 RUN ckan-pip install git+https://github.com/okfn/ckanext-s3filestore boto3>=1.4.4 ckantoolkit
 
 # Collaborators extension
-RUN ckan-pip install git+https://github.com/okfn/ckanext-collaborators.git
+#RUN ckan-pip install git+https://github.com/okfn/ckanext-collaborators.git
 
 # Hierarchy extension
 RUN ckan-pip install git+https://github.com/ckan/ckanext-hierarchy.git
