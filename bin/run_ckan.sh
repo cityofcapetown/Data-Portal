@@ -2,16 +2,20 @@
 set -e
 
 tmpdir=/tmp
-default_minio_access=cctAIOSFODNN7EXAMPLE
-default_minio_secret=cctlrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+default_aws_access=cctAIOSFODNN7EXAMPLE
+default_aws_secret=cctlrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+default_aws_region="us-east-1"
+default_aws_host="https://lake.capetown.gov.za"
 default_port=8001
+default_hostname="http://192.168.2.1:$CKAN_PORT"
 
 DATA_DIR=${1:-$tmpdir}
-MINIO_ACCESS_KEY=${2:-$default_minio_access}
-MINIO_SECRET_KEY=${3:-$default_minio_secret}
-CKAN_PORT=${4:-$default_port}
-default_hostname="http://192.168.2.1:$CKAN_PORT"
-CKAN_HOSTNAME=${5:-$default_hostname}
+AWS_ACCESS_KEY=${2:-$default_aws_access}
+AWS_SECRET_KEY=${3:-$default_aws_secret}
+AWS_REGION=${4:-$default_aws_region}
+AWS_HOST=${5:-$default_aws_host}
+CKAN_PORT=${6:-$default_port}
+CKAN_HOSTNAME=${7:-$default_hostname}
 
 echo Installing everything to "$DATA_DIR"
 
@@ -37,9 +41,6 @@ cp config/datapusher_settings.py $DATA_DIR/ckan-datapusher-data/
 mkdir -p $DATA_DIR/ckan-datastore-db-data
 chmod a+rw -R $DATA_DIR/ckan-datastore-db-data
 
-mkdir -p $DATA_DIR/ckan-minio-data
-chmod a+rw -R $DATA_DIR/ckan-minio-data
-
 # Making storage location (shouldn't be used)
 mkdir -p $DATA_DIR/ckan-storage
 chmod a+rw -R $DATA_DIR/ckan-storage
@@ -55,7 +56,6 @@ docker run --name db --network ckan --restart always -d -v $DATA_DIR/ckan-db-dat
 
 docker run --name ckan-datastore-db --network ckan --restart always -d -v $DATA_DIR/ckan-datastore-db-data:/var/lib/postgresql/data -e DS_RO_PASS=ckan_ro ckan/postgresql
 
-docker run --name ckan-minio --network ckan --restart always -d -p 9000:9000 -e "MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY" -e "MINIO_SECRET_KEY=$MINIO_SECRET_KEY" minio/minio server $DATA_DIR/ckan-minio-data
 
 # Setting up CKAN
 docker run --name ckan \
@@ -73,9 +73,11 @@ docker run --name ckan \
 	   -e CKAN_PORT=$CKAN_PORT \
            -e POSTGRES_PASSWORD=ckan \
            -e DS_RO_PASS=ckan_ro \
-	   -e CKAN___CKANEXT__S3FILESTORE__AWS_ACCESS_KEY_ID="$MINIO_ACCESS_KEY" \
-	   -e CKAN___CKANEXT__S3FILESTORE__AWS_SECRET_ACCESS_KEY="$MINIO_SECRET_KEY" \
-           -v $DATA_DIR/ckan-config:/etc/ckan \
+	   -e CKAN___CKANEXT__S3FILESTORE__AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY" \
+	   -e CKAN___CKANEXT__S3FILESTORE__AWS_SECRET_ACCESS_KEY="$AWS_SECRET_KEY" \
+	   -e CKAN___CKANEXT__S3FILESTORE__REGION_NAME="$AWS_REGION_NAME" \
+	   -e CKAN___CKANEXT__S3FILESTORE__HOST_NAME="$AWS_HOST_NAME" \
+     -v $DATA_DIR/ckan-config:/etc/ckan \
 	   -v $DATA_DIR/ckan-storage:/var/lib/ckan \
 	   -p $CKAN_PORT:5000 \
 	   -it \
