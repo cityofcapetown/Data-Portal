@@ -57,27 +57,8 @@ RUN ckan-pip install -U pip && \
     chown -R ckan:ckan $CKAN_HOME $CKAN_VENV $CKAN_CONFIG $CKAN_STORAGE_PATH
 
 # Setting up extensions
-# Private Datasets extension
-RUN ckan-pip install ckanext-privatedatasets
-
-## Resource authorisation extension
-RUN ckan-pip install git+https://github.com/etri-odp/ckanext-resourceauthorizer.git
-
-## Custom Schema extension
-RUN ckan-pip install -r https://raw.githubusercontent.com/ckan/ckanext-scheming/master/requirements.txt && \
-    ckan-pip install git+https://github.com/ckan/ckanext-scheming.git
-
-## Extra security extension
-RUN ckan-pip install git+https://github.com/data-govt-nz/ckanext-security.git Beaker==1.6.4
-
 # S3 filestore extension
-RUN ckan-pip install git+https://github.com/okfn/ckanext-s3filestore@v0.1.1 boto3>=1.4.4 ckantoolkit
-
-# Collaborators extension
-RUN ckan-pip install git+https://github.com/okfn/ckanext-collaborators.git@0.0.4
-
-# CCT Metadata extension
-RUN ckan-pip install git+https://github.com/cityofcapetown/ckanext-cct_metadata.git
+RUN ckan-pip install git+https://github.com/keitaroinc/ckanext-s3filestore@v0.1.0
 
 # And back to getting things up
 ENTRYPOINT ["/ckan-entrypoint.sh"]
