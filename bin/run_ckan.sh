@@ -2,20 +2,24 @@
 set -e
 
 tmpdir=/tmp
+default_aws_bucket=cct-ckan-data
 default_aws_access=cctAIOSFODNN7EXAMPLE
 default_aws_secret=cctlrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 default_aws_region="us-east-1"
 default_aws_host="https://lake.capetown.gov.za"
 default_port=8001
 default_hostname="http://192.168.2.1:$CKAN_PORT"
+default_root_path="data-catalogue"
 
 DATA_DIR=${1:-$tmpdir}
-AWS_ACCESS_KEY=${2:-$default_aws_access}
-AWS_SECRET_KEY=${3:-$default_aws_secret}
-AWS_REGION=${4:-$default_aws_region}
-AWS_HOST=${5:-$default_aws_host}
-CKAN_PORT=${6:-$default_port}
-CKAN_HOSTNAME=${7:-$default_hostname}
+AWS_BUCKET_NAME=${2:-$default_aws_bucket}
+AWS_ACCESS_KEY=${3:-$default_aws_access}
+AWS_SECRET_KEY=${4:-$default_aws_secret}
+AWS_REGION=${5:-$default_aws_region}
+AWS_HOST=${6:-$default_aws_host}
+CKAN_PORT=${7:-$default_port}
+CKAN_HOSTNAME=${8:-$default_hostname}
+CKAN_ROOT_PATH=${9:-$default_root_path}
 
 echo Installing everything to "$DATA_DIR"
 
@@ -45,6 +49,15 @@ chmod a+rw -R $DATA_DIR/ckan-datastore-db-data
 mkdir -p $DATA_DIR/ckan-storage
 chmod a+rw -R $DATA_DIR/ckan-storage
 
+# Updating configuration
+CKAN_CONFIG=${DATA_DIR}/ckan-config/production.ini
+sed -i "s/AWS_BUCKET_NAME_GOES_HERE/${AWS_BUCKET_NAME}/g"
+sed -i "s/AWS_ACCESS_KEY_GOES_HERE/${AWS_ACCESS_KEY}/g"
+sed -i "s/AWS_SECRET_ACCESS_KEY_GOES_HERE/${AWS_SECRET_KEY}/g"
+sed -i "s/AWS_REGION_NAME_GOES_HERE/${AWS_REGION}/g"
+sed -i "s/AWS_HOST_NAME_GOES_HERE/${AWS_HOST}/g"
+sed -i "s/CKAN_ROOT_PATH_GOES_HERE/${CKAN_ROOT_PATH}/g"
+
 # Creating supporting services
 docker run --name ckan-redis --network ckan --restart always -d redis:latest
 
@@ -73,10 +86,6 @@ docker run --name ckan \
 	   -e CKAN_PORT=$CKAN_PORT \
            -e POSTGRES_PASSWORD=ckan \
            -e DS_RO_PASS=ckan_ro \
-	   -e CKAN___CKANEXT__S3FILESTORE__AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY" \
-	   -e CKAN___CKANEXT__S3FILESTORE__AWS_SECRET_ACCESS_KEY="$AWS_SECRET_KEY" \
-	   -e CKAN___CKANEXT__S3FILESTORE__REGION_NAME="$AWS_REGION_NAME" \
-	   -e CKAN___CKANEXT__S3FILESTORE__HOST_NAME="$AWS_HOST_NAME" \
      -v $DATA_DIR/ckan-config:/etc/ckan \
 	   -v $DATA_DIR/ckan-storage:/var/lib/ckan \
 	   -p $CKAN_PORT:5000 \
@@ -84,8 +93,6 @@ docker run --name ckan \
 	   cityofcapetown/data-portal@sha256:4076055d86ae2c5d010737ef57ee9844ff084801ec06d9612e5a190fd7a4d0e7
 
 # Setting permissions
-docker exec ckan /usr/local/bin/ckan-paster --plugin=ckan datastore set-permissions -c /etc/ckan/production.ini | \
+docker exec ckan ckan --config /etc/ckan/production.ini datastore set-permissions | \
   docker exec -i ckan-datastore-db psql -U ckan
-
-docker exec ckan /usr/local/bin/ckan-paster --plugin=ckanext-collaborators collaborators init-db -c /etc/ckan/production.ini
 
