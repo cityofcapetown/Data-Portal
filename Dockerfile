@@ -57,7 +57,7 @@ RUN ckan-pip install -U pip && \
 
 # Setting up extensions
 # S3 filestore extension
-RUN ckan-pip install git+https://github.com/qld-gov-au/ckanext-s3filestore@OL-7545-ckan-2.9 boto3>=1.14.17 ckantoolkit>=0.0.4
+RUN ckan-pip install git+https://github.com/qld-gov-au/ckanext-s3filestore@QOL-7545-ckan-2.9 boto3>=1.14.17 ckantoolkit>=0.0.4
 
 # And back to getting things up
 COPY bin/ckan-entrypoint.sh /ckan-entrypoint.sh
