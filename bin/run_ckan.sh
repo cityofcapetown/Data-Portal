@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
 
-tmpdir=/tmp
-default_minio_access=cctAIOSFODNN7EXAMPLE
-default_minio_secret=cctlrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-default_port=8001
+tmpdir=/home/ubuntu/ckan
+default_port=5000
 
 DATA_DIR=${1:-$tmpdir}
+
+default_minio_access=cctAIOSFODNN7EXAMPLE
+default_minio_secret=cctlrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+
 MINIO_ACCESS_KEY=${2:-$default_minio_access}
 MINIO_SECRET_KEY=${3:-$default_minio_secret}
 CKAN_PORT=${4:-$default_port}
-default_hostname="http://192.168.2.1:$CKAN_PORT"
+default_hostname="https://cct.opencitieslab.org"
 CKAN_HOSTNAME=${5:-$default_hostname}
 
 echo Installing everything to "$DATA_DIR"
@@ -54,7 +56,7 @@ docker run --name db --network ckan --restart always -d -v $DATA_DIR/ckan-db-dat
 
 docker run --name ckan-datastore-db --network ckan --restart always -d -v $DATA_DIR/ckan-datastore-db-data:/var/lib/postgresql/data -e DS_RO_PASS=ckan_ro ckan/postgresql
 
-docker run --name ckan-minio --network ckan --restart always -d -p 9000:9000 -e "MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY" -e "MINIO_SECRET_KEY=$MINIO_SECRET_KEY" minio/minio server $DATA_DIR/ckan-minio-data
+#docker run --name ckan-minio --network ckan --restart always -d -p 9000:9000 -e "MINIO_ACCESS_KEY=$MINIO_ACCESS_KEY" -e "MINIO_SECRET_KEY=$MINIO_SECRET_KEY" minio/minio server $DATA_DIR/ckan-minio-data
 
 # Setting up CKAN
 docker run --name ckan \
@@ -84,5 +86,12 @@ docker run --name ckan \
 docker exec ckan /usr/local/bin/ckan-paster --plugin=ckan datastore set-permissions -c /etc/ckan/production.ini | \
   docker exec -i ckan-datastore-db psql -U ckan
 
-docker exec ckan /usr/local/bin/ckan-paster --plugin=ckanext-collaborators collaborators init-db -c /etc/ckan/production.ini
+#docker exec ckan /usr/local/bin/ckan-paster --plugin=ckanext-collaborators collaborators init-db -c /etc/ckan/production.ini
 
+# Create Sysadmin
+docker exec -it ckan /usr/local/bin/ckan-paster --plugin=ckan sysadmin -c /etc/ckan/production.ini add johndoe
+
+# Don't forget to:
+
+# sudo certbot certonly --standalone -d <FQDN e.g. data.demo.com>
+docker run -d --restart always -v /etc/letsencrypt:/etc/nginx/certs:z -v /home/ubuntu/Data-Portal/config/default.conf:/etc/nginx/conf.d/default.conf --network ckan --name ckan-proxy -p 443:443 -p 80:80 nginx

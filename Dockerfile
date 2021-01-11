@@ -1,5 +1,5 @@
 FROM debian:stretch
-MAINTAINER Gordon Inggs, Riaz Arbi, Derek Strong
+MAINTAINER Gordon Inggs, Riaz Arbi, Derek Strong, Matthew Adendorff, Wasim Moosa
 # With thanks to the main CKAN dockerfile - https://github.com/ckan/ckan/blob/ckan-2.8.3/Dockerfile
 
 # Install required system packages
@@ -42,7 +42,7 @@ RUN mkdir -p $CKAN_VENV $CKAN_CONFIG $CKAN_STORAGE_PATH && \
 # Setup CKAN
 RUN git clone https://github.com/ckan/ckan.git $CKAN_VENV/src/ckan/
 # Locking the version to 2.8.3
-RUN cd $CKAN_VENV/src/ckan/ && git checkout tags/ckan-2.8.3
+RUN cd $CKAN_VENV/src/ckan/ && git checkout tags/ckan-2.9.0
 RUN ckan-pip install -U pip && \
     ckan-pip install --upgrade --no-cache-dir -r $CKAN_VENV/src/ckan/requirement-setuptools.txt && \
     ckan-pip install --upgrade --no-cache-dir -r $CKAN_VENV/src/ckan/requirements.txt && \
@@ -67,13 +67,16 @@ RUN ckan-pip install -r https://raw.githubusercontent.com/ckan/ckanext-scheming/
 RUN ckan-pip install git+https://github.com/data-govt-nz/ckanext-security.git Beaker==1.6.4
 
 # S3 filestore extension
-RUN ckan-pip install git+https://github.com/okfn/ckanext-s3filestore@v0.1.1 boto3>=1.4.4 ckantoolkit
+RUN ckan-pip install git+https://github.com/okfn/ckanext-s3filestore boto3>=1.4.4 ckantoolkit
 
 # Collaborators extension
-RUN ckan-pip install git+https://github.com/okfn/ckanext-collaborators.git@0.0.4
+#RUN ckan-pip install git+https://github.com/okfn/ckanext-collaborators.git
+
+# Hierarchy extension
+RUN ckan-pip install git+https://github.com/ckan/ckanext-hierarchy.git
 
 # CCT Metadata extension
-RUN ckan-pip install git+https://github.com/cityofcapetown/ckanext-cct_metadata.git
+#RUN ckan-pip install git+https://github.com/cityofcapetown/ckanext-cct_metadata.git
 
 # And back to getting things up
 ENTRYPOINT ["/ckan-entrypoint.sh"]
