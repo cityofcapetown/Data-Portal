@@ -51,12 +51,15 @@ chmod a+rw -R $DATA_DIR/ckan-storage
 
 # Updating configuration
 CKAN_CONFIG=${DATA_DIR}/ckan-config/production.ini
-sed -i "s/AWS_BUCKET_NAME_GOES_HERE/${AWS_BUCKET_NAME}/g"
-sed -i "s/AWS_ACCESS_KEY_GOES_HERE/${AWS_ACCESS_KEY}/g"
-sed -i "s/AWS_SECRET_ACCESS_KEY_GOES_HERE/${AWS_SECRET_KEY}/g"
-sed -i "s/AWS_REGION_NAME_GOES_HERE/${AWS_REGION}/g"
-sed -i "s/AWS_HOST_NAME_GOES_HERE/${AWS_HOST}/g"
-sed -i "s/CKAN_ROOT_PATH_GOES_HERE/${CKAN_ROOT_PATH}/g"
+sed -i "s|AWS_BUCKET_NAME_GOES_HERE|${AWS_BUCKET_NAME}|g" $CKAN_CONFIG
+sed -i "s|AWS_ACCESS_KEY_GOES_HERE|${AWS_ACCESS_KEY}|g" $CKAN_CONFIG
+sed -i "s|AWS_SECRET_ACCESS_KEY_GOES_HERE|${AWS_SECRET_KEY}|g" $CKAN_CONFIG
+sed -i "s|AWS_REGION_NAME_GOES_HERE|${AWS_REGION}|g" $CKAN_CONFIG
+sed -i "s|AWS_HOST_NAME_GOES_HERE|${AWS_HOST}|g" $CKAN_CONFIG
+sed -i "s|CKAN_ROOT_PATH_GOES_HERE|${CKAN_ROOT_PATH}|g" $CKAN_CONFIG
+
+WHO_CONFIG=${DATA_DIR}/ckan-config/who.ini
+sed -i "s|CKAN_ROOT_PATH_GOES_HERE|${CKAN_ROOT_PATH}|g" $WHO_CONFIG
 
 # Creating supporting services
 docker run --name ckan-redis --network ckan --restart always -d redis:latest
@@ -73,26 +76,31 @@ docker run --name ckan-datastore-db --network ckan --restart always -d -v $DATA_
 # Setting up CKAN
 docker run --name ckan \
 	   --network ckan \
-           --restart always \
-           -d \
-           -e CKAN_SQLALCHEMY_URL=postgresql://ckan:ckan@db/ckan \
-           -e CKAN_DATASTORE_WRITE_URL=postgresql://ckan:ckan@ckan-datastore-db/datastore \
-           -e CKAN_DATASTORE_READ_URL=postgresql://datastore_ro:ckan_ro@ckan-datastore-db/datastore \
+     --restart always \
+     -d \
+     -e CKAN_SQLALCHEMY_URL=postgresql://ckan:ckan@db/ckan \
+     -e CKAN_DATASTORE_WRITE_URL=postgresql://ckan:ckan@ckan-datastore-db/datastore \
+     -e CKAN_DATASTORE_READ_URL=postgresql://datastore_ro:ckan_ro@ckan-datastore-db/datastore \
 	   -e CKAN_DATAPUSHER_URL=http://ckan-datapusher:8800 \
 	   -e CKAN_DATAPUSHER_CALLBACK_URL_BASE=http://ckan:5000/ \
 	   -e CKAN_SOLR_URL=http://ckan-solr:8983/solr/ckan \
-           -e CKAN_REDIS_URL=redis://ckan-redis:6379/1 \
+     -e CKAN_REDIS_URL=redis://ckan-redis:6379/1 \
 	   -e CKAN_SITE_URL=$CKAN_HOSTNAME \
 	   -e CKAN_PORT=$CKAN_PORT \
-           -e POSTGRES_PASSWORD=ckan \
-           -e DS_RO_PASS=ckan_ro \
+     -e POSTGRES_PASSWORD=ckan \
+     -e DS_RO_PASS=ckan_ro \
      -v $DATA_DIR/ckan-config:/etc/ckan \
 	   -v $DATA_DIR/ckan-storage:/var/lib/ckan \
 	   -p $CKAN_PORT:5000 \
 	   -it \
 	   cityofcapetown/data-portal@sha256:4076055d86ae2c5d010737ef57ee9844ff084801ec06d9612e5a190fd7a4d0e7
 
+# Giving things a chance to start up
+sleep 10
+
 # Setting permissions
 docker exec ckan ckan --config /etc/ckan/production.ini datastore set-permissions | \
   docker exec -i ckan-datastore-db psql -U ckan
 
+# Creating an admin user
+docker exec -it ckan ckan --config /etc/ckan/production.ini sysadmin add ckan_admin
