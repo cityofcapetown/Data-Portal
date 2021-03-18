@@ -56,9 +56,13 @@ RUN ckan-pip install -U pip && \
     chown -R ckan:ckan $CKAN_HOME $CKAN_VENV $CKAN_CONFIG $CKAN_STORAGE_PATH
 
 # Setting up extensions
-# S3 filestore extension
-RUN ckan-pip install -r https://raw.githubusercontent.com/qld-gov-au/ckanext-s3filestore/0.6.1-qgov/requirements.txt
-RUN ckan-pip install git+https://github.com/qld-gov-au/ckanext-s3filestore@0.6.1-qgov
+## S3 filestore extension
+RUN ckan-pip install -r https://raw.githubusercontent.com/qld-gov-au/ckanext-s3filestore/0.6.1-qgov/requirements.txt && \
+    ckan-pip install git+https://github.com/qld-gov-au/ckanext-s3filestore@0.6.1-qgov
+
+## Hierarchy extension
+RUN ckan-pip install -r https://raw.githubusercontent.com/ckan/ckanext-hierarchy/1dda3fd65d57759276eb18ae63c7c9fd73e0c5f5/requirements.txt && \
+    ckan-pip install git+https://github.com/ckan/ckanext-hierarchy@1dda3fd65d57759276eb18ae63c7c9fd73e0c5f5
 
 # Hierarchy extension
 RUN ckan-pip install -r https://raw.githubusercontent.com/ckan/ckanext-hierarchy/1dda3fd65d57759276eb18ae63c7c9fd73e0c5f5/requirements.txt
