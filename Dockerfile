@@ -46,8 +46,8 @@ RUN mkdir -p $CKAN_VENV $CKAN_CONFIG $CKAN_STORAGE_PATH && \
 
 # Setup CKAN
 RUN git clone https://github.com/ckan/ckan.git $CKAN_VENV/src/ckan/
-# Locking the version to 2.9.1
-RUN cd $CKAN_VENV/src/ckan/ && git checkout tags/ckan-2.9.1
+# Locking the version to 2.9.2
+RUN cd $CKAN_VENV/src/ckan/ && git checkout tags/ckan-2.9.2
 RUN ckan-pip install -U pip && \
     ckan-pip install --upgrade --no-cache-dir -r $CKAN_VENV/src/ckan/requirement-setuptools.txt && \
     ckan-pip install --upgrade --no-cache-dir -r $CKAN_VENV/src/ckan/requirements-py2.txt && \
