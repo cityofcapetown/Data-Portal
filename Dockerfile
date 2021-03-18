@@ -64,9 +64,12 @@ RUN ckan-pip install -r https://raw.githubusercontent.com/qld-gov-au/ckanext-s3f
 RUN ckan-pip install -r https://raw.githubusercontent.com/ckan/ckanext-hierarchy/1dda3fd65d57759276eb18ae63c7c9fd73e0c5f5/requirements.txt && \
     ckan-pip install git+https://github.com/ckan/ckanext-hierarchy@1dda3fd65d57759276eb18ae63c7c9fd73e0c5f5
 
-# Hierarchy extension
-RUN ckan-pip install -r https://raw.githubusercontent.com/ckan/ckanext-hierarchy/1dda3fd65d57759276eb18ae63c7c9fd73e0c5f5/requirements.txt
-RUN ckan-pip install git+https://github.com/ckan/ckanext-hierarchy@1dda3fd65d57759276eb18ae63c7c9fd73e0c5f5
+## Custom Schema extension
+RUN ckan-pip install -r https://raw.githubusercontent.com/ckan/ckanext-scheming/release-1.2.0/requirements.txt && \
+    ckan-pip install git+https://github.com/ckan/ckanext-scheming.git@release-1.2.0
+
+## CCT Metadata
+RUN ckan-pip install git+https://github.com/cityofcapetown/ckanext-cct_metadata.git@v0.1
 
 # And back to getting things up
 COPY bin/ckan-entrypoint.sh /ckan-entrypoint.sh
