@@ -69,7 +69,8 @@ RUN ckan-pip install -r https://raw.githubusercontent.com/ckan/ckanext-scheming/
     ckan-pip install git+https://github.com/ckan/ckanext-scheming.git@release-1.2.0
 
 ## CCT Metadata
-RUN ckan-pip install git+https://github.com/cityofcapetown/ckanext-cct_metadata.git@v0.1
+RUN ckan-pip install -r https://raw.githubusercontent.com/cityofcapetown/ckanext-cct_metadata/wip/v0.2/requirements.txt && \
+    ckan-pip install git+https://github.com/cityofcapetown/ckanext-cct_metadata.git@wip/v0.2
 
 # And back to getting things up
 COPY bin/ckan-entrypoint.sh /ckan-entrypoint.sh
