@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
       - name: ckan-frontend
-        image: cityofcapetown/data-portal@sha256:5bbce8b7da063a3375cda86e5bda09a6a01df9a75d87cfb11d229231f2b92809
+        image: cityofcapetown/data-portal@sha256:4076055d86ae2c5d010737ef57ee9844ff084801ec06d9612e5a190fd7a4d0e7
         ports:
         - containerPort: 5000
         volumeMounts:
