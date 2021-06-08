@@ -10,6 +10,10 @@ RUN apt-get -q -y update \
         python-pip \
         python-virtualenv \
         python-wheel \
+        python3-dev \
+        python3-pip \
+        python3-virtualenv \
+        python3-wheel \
         libpq-dev \
         libxml2-dev \
         libxslt-dev \
@@ -36,49 +40,44 @@ RUN useradd -r -u 900 -m -c "ckan account" -d $CKAN_HOME -s /bin/false ckan
 # Setup virtual environment for CKAN
 RUN mkdir -p $CKAN_VENV $CKAN_CONFIG $CKAN_STORAGE_PATH && \
     virtualenv $CKAN_VENV && \
-    ln -s $CKAN_VENV/bin/pip /usr/local/bin/ckan-pip &&\
-    ln -s $CKAN_VENV/bin/paster /usr/local/bin/ckan-paster
+    ln -s $CKAN_VENV/bin/pip /usr/local/bin/ckan-pip && \
+    ln -s $CKAN_VENV/bin/paster /usr/local/bin/ckan-paster && \
+    ln -s $CKAN_VENV/bin/ckan /usr/local/bin/ckan
 
 # Setup CKAN
 RUN git clone https://github.com/ckan/ckan.git $CKAN_VENV/src/ckan/
-# Locking the version to 2.8.3
-RUN cd $CKAN_VENV/src/ckan/ && git checkout tags/ckan-2.8.3
+# Locking the version to 2.9.2
+RUN cd $CKAN_VENV/src/ckan/ && git checkout tags/ckan-2.9.2
 RUN ckan-pip install -U pip && \
     ckan-pip install --upgrade --no-cache-dir -r $CKAN_VENV/src/ckan/requirement-setuptools.txt && \
-    ckan-pip install --upgrade --no-cache-dir -r $CKAN_VENV/src/ckan/requirements.txt && \
+    ckan-pip install --upgrade --no-cache-dir -r $CKAN_VENV/src/ckan/requirements-py2.txt && \
     ckan-pip install -e $CKAN_VENV/src/ckan/ && \
     ln -s $CKAN_VENV/src/ckan/ckan/config/who.ini $CKAN_CONFIG/who.ini && \
-    cp -v $CKAN_VENV/src/ckan/contrib/docker/ckan-entrypoint.sh /ckan-entrypoint.sh && \
-    chmod +x /ckan-entrypoint.sh && \
     chown -R ckan:ckan $CKAN_HOME $CKAN_VENV $CKAN_CONFIG $CKAN_STORAGE_PATH
 
 # Setting up extensions
-# Private Datasets extension
-RUN ckan-pip install ckanext-privatedatasets
+## S3 filestore extension
+RUN ckan-pip install -r https://raw.githubusercontent.com/qld-gov-au/ckanext-s3filestore/0.6.1-qgov/requirements.txt && \
+    ckan-pip install git+https://github.com/qld-gov-au/ckanext-s3filestore@0.6.1-qgov
 
-## Resource authorisation extension
-RUN ckan-pip install git+https://github.com/etri-odp/ckanext-resourceauthorizer.git
+## Hierarchy extension
+RUN ckan-pip install -r https://raw.githubusercontent.com/ckan/ckanext-hierarchy/1dda3fd65d57759276eb18ae63c7c9fd73e0c5f5/requirements.txt && \
+    ckan-pip install git+https://github.com/ckan/ckanext-hierarchy@1dda3fd65d57759276eb18ae63c7c9fd73e0c5f5
 
 ## Custom Schema extension
-RUN ckan-pip install -r https://raw.githubusercontent.com/ckan/ckanext-scheming/master/requirements.txt && \
-    ckan-pip install git+https://github.com/ckan/ckanext-scheming.git
+RUN ckan-pip install -r https://raw.githubusercontent.com/ckan/ckanext-scheming/release-1.2.0/requirements.txt && \
+    ckan-pip install git+https://github.com/ckan/ckanext-scheming.git@release-1.2.0
 
-## Extra security extension
-RUN ckan-pip install git+https://github.com/data-govt-nz/ckanext-security.git Beaker==1.6.4
-
-# S3 filestore extension
-RUN ckan-pip install git+https://github.com/okfn/ckanext-s3filestore@v0.1.1 boto3>=1.4.4 ckantoolkit
-
-# Collaborators extension
-RUN ckan-pip install git+https://github.com/okfn/ckanext-collaborators.git@0.0.4
-
-# CCT Metadata extension
-RUN ckan-pip install git+https://github.com/cityofcapetown/ckanext-cct_metadata.git
+## CCT Metadata
+RUN ckan-pip install -r https://raw.githubusercontent.com/cityofcapetown/ckanext-cct_metadata/wip/v0.2/requirements.txt && \
+    ckan-pip install git+https://github.com/cityofcapetown/ckanext-cct_metadata.git@wip/v0.2
 
 # And back to getting things up
+COPY bin/ckan-entrypoint.sh /ckan-entrypoint.sh
+RUN chmod +x /ckan-entrypoint.sh
 ENTRYPOINT ["/ckan-entrypoint.sh"]
 
 USER ckan
 EXPOSE 5000
 
-CMD ["ckan-paster","serve","/etc/ckan/production.ini"]
+CMD ["ckan","-c","/etc/ckan/production.ini", "run", "--host", "0.0.0.0"]
