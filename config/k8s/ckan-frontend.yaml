@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
       - name: ckan-frontend
-        image: cityofcapetown/data-portal
+        image: cityofcapetown/data-portal@sha256:5bbce8b7da063a3375cda86e5bda09a6a01df9a75d87cfb11d229231f2b92809
         ports:
         - containerPort: 5000
         volumeMounts:
@@ -97,4 +97,61 @@ spec:
         backend:
           serviceName: ckan-frontend
           servicePort: 80
+---
+# Solr
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ckan-solr-data
+  namespace: ckan
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ckan-solr
+  namespace: ckan
+spec:
+  selector:
+    matchLabels:
+      run: ckan-solr
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: ckan-solr
+    spec:
+      containers:
+      - name: ckan-solr
+        image: ckan/solr
+        ports:
+        - containerPort: 8983 
+        volumeMounts:
+        - mountPath: "/opt/solr/server/solr/ckan/data"
+          name: ckan-solr-data
+      volumes:
+        - name: ckan-solr-data
+          persistentVolumeClaim:
+            claimName: ckan-solr-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ckan-solr
+  namespace: ckan
+  labels:
+    run: ckan-solr
+spec:
+  ports:
+  - port: 8983
+    protocol: TCP
+  selector:
+    run: ckan-solr
 ---
