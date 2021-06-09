@@ -8,13 +8,15 @@ Also, the work done by OpenUp on [SA's National Treasury CKAN](https://github.co
 
 **NB** The below config is strictly for development purposes, and is horribly insecure.
 
-1. Run the script `bash bin/run_ckan.sh` 
-2. Copy across the config files into the CKAN config directory specified in the run script
-3. Create an admin user: `docker exec -it ckan /usr/local/bin/ckan-paster --plugin=ckan sysadmin -c /etc/ckan/production.ini add ckan_admin`
-4. CKAN should be accessible at <hostname>:8001
-5. Remove everything: `bash bin/rm_ckan.sh`
+### Docker
+Deploys everything to one host that needs Docker installed. On the plus side, very simple, on the minus, as reliable as
+that one host.
 
-## Customising for Production
+1. Run the script `bash bin/run_ckan.sh` - see the script for the args
+2. CKAN should be accessible at <hostname>:8001
+3. Remove everything: `bash bin/rm_ckan.sh`
+
+#### Customising for Production
 Working notes on what has to be done to prepare this install for production deployment:
 * Change location of all mounted volumes to somewhere other than `/tmp`.
 * Change Access and Secret key for Minio when spinning up container, and also in the CKAN config file.
@@ -27,8 +29,13 @@ Working notes on what has to be done to prepare this install for production depl
   * Set up NGINX config with proxy rules to pass traffic from port `443` to port `5000` (the one that CKAN is on). See config directory for example config.
   * Create the NGINX reverse proxy: `docker run -d --restart always -v <path to letsencrypt certs e.g. /etc/letsencrypt>:/etc/nginx/certs:z -v <Path to NGINX config>:/etc/nginx/conf.d/default.conf --network ckan --name ckan-proxy -p 443:443 -p 80:80 nginx`
 
-## Kubernetes
-1. Use [deploy script](./bin/deploy.sh) from the this repo, i.e. `./bin/deploy.sh`:
-  ```bash
-  ./bin/deploy.sh <POSTGRES DB Password> <Datastore DB Read only Password> <Minio/S3 Access Key> <Minio/S3 Secret Key>
-  ```
+### Kubernetes Deployment
+Deploys to a kubernetes cluster. Gives you the reliability guarantees of your k8s cluster, but has more moving parts.
+
+1. Run the script `bash bin/deploy.sh` - see the script for the args
+2. CKAN should be accessible on `https://datascience.capetown.gov.za/ckan-test`
+
+#### Customising for Production
+
+* Should change namespace values in various YAML specs and configs to use something other than `ckan`
+* Use non-default values for various passwords

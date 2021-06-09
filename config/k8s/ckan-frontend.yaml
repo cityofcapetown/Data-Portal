@@ -5,6 +5,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: ckan-data
   namespace: ckan
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "longhorn"
 spec:
   accessModes:
     - ReadWriteMany
@@ -30,7 +32,7 @@ spec:
     spec:
       containers:
       - name: ckan-frontend
-        image: cityofcapetown/data-portal@sha256:4076055d86ae2c5d010737ef57ee9844ff084801ec06d9612e5a190fd7a4d0e7
+        image: cityofcapetown/data-portal@sha256:eb1890af3d2b593c8935c1e6a3fd6eb315c71e1d320c6860deeb905c6f81b4b8
         ports:
         - containerPort: 5000
         volumeMounts:
@@ -47,7 +49,7 @@ spec:
             name: ckan-secret
         env:
         - name: "CKAN_SITE_URL"
-          value: "https://ds3.capetown.gov.za"
+          value: "https://datascience.capetown.gov.za"
         - name: "CKAN_SOLR_URL"
           value: "http://ckan-solr:8983/solr/ckan"
         - name: "CKAN_REDIS_URL"
@@ -93,7 +95,7 @@ spec:
   - host:  
     http:
       paths:
-      - path: /data-catalogue
+      - path: /ckan-test
         backend:
           serviceName: ckan-frontend
           servicePort: 80
@@ -105,6 +107,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: ckan-solr-data
   namespace: ckan
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "longhorn"
 spec:
   accessModes:
     - ReadWriteOnce

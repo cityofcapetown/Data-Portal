@@ -7,7 +7,7 @@ metadata:
 spec:
   containers:
   - name: ckan-permission-setup 
-    image: cityofcapetown/data-portal
+    image: cityofcapetown/data-portal@sha256:eb1890af3d2b593c8935c1e6a3fd6eb315c71e1d320c6860deeb905c6f81b4b8
     volumeMounts:
     - mountPath: "/etc/ckan/production.ini"
       subPath: "production.ini"
@@ -19,14 +19,14 @@ spec:
     - secretRef:
         name: ckan-secret
     env:
-    - name: "CKAN_SITE_URL"
-      value: "https://ds3.capetown.gov.za"
-    - name: "CKAN_SOLR_URL"
-      value: "http://ckan-solr:8983/solr/ckan"
-    - name: "CKAN_REDIS_URL"
-      value: "redis://ckan-redis:6379/1"
-    - name: "CKAN_DATAPUSHER_URL"
-      value: "http://ckan-datapusher:8800/"
+      - name: "CKAN_SITE_URL"
+        value: "https://datascience.capetown.gov.za"
+      - name: "CKAN_SOLR_URL"
+        value: "http://ckan-solr:8983/solr/ckan"
+      - name: "CKAN_REDIS_URL"
+        value: "redis://ckan-redis:6379/1"
+      - name: "CKAN_DATAPUSHER_URL"
+        value: "http://ckan-datapusher:8800/"
     command:
     - "cat"
     args:
