@@ -50,7 +50,7 @@ docker run --name ckan-redis --network ckan --restart always -d redis:latest
 
 docker run --name ckan-solr --network ckan --restart always -d -v $DATA_DIR/solr-data:/opt/solr/server/solr/ckan/data ckan/solr
 
-docker run --name ckan-datapusher --network ckan --restart always -d -e SSL_VERIFY=False -p 8800:8800 -v $DATA_DIR/ckan-datapusher-data/datapusher_settings.py:/usr/src/app/deployment/datapusher_settings.py clementmouchet/datapusher
+docker run --name ckan-datapusher --network ckan --restart always -d -e SSL_VERIFY=False  -e MAX_CONTENT_LENGTH=102400005  -e DATAPUSHER_MAX_CONTENT_LENGTH=102400005 -p 8800:8800 -v $DATA_DIR/ckan-datapusher-data/datapusher_settings.py:/usr/src/app/deployment/datapusher_settings.py  keitaro/ckan-datapusher
 
 docker run --name db --network ckan --restart always -d -v $DATA_DIR/ckan-db-data:/var/lib/postgresql/data ckan/postgresql
 
@@ -63,6 +63,8 @@ docker run --name ckan \
 	   --network ckan \
            --restart always \
            -d \
+           -e CKAN_DATAPUSHER_DATAPUSHER_MAX_CONTENT_LENGTH=102400005 \
+           -e CKAN_DATAPUSHER_MAX_CONTENT_LENGTH=102400005 \
            -e CKAN_SQLALCHEMY_URL=postgresql://ckan:ckan@db/ckan \
            -e CKAN_DATASTORE_WRITE_URL=postgresql://ckan:ckan@ckan-datastore-db/datastore \
            -e CKAN_DATASTORE_READ_URL=postgresql://datastore_ro:ckan_ro@ckan-datastore-db/datastore \
@@ -89,7 +91,7 @@ docker exec ckan /usr/local/bin/ckan-paster --plugin=ckan datastore set-permissi
 #docker exec ckan /usr/local/bin/ckan-paster --plugin=ckanext-collaborators collaborators init-db -c /etc/ckan/production.ini
 
 # Create Sysadmin
-docker exec -it ckan /usr/local/bin/ckan-paster --plugin=ckan sysadmin -c /etc/ckan/production.ini add johndoe
+docker exec -it ckan /usr/local/bin/ckan-paster --plugin=ckan sysadmin -c /etc/ckan/production.ini add ckan_admin
 
 # Don't forget to:
 
