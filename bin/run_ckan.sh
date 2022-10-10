@@ -50,7 +50,7 @@ docker run --name ckan-redis --network ckan --restart always -d redis:latest
 
 docker run --name ckan-solr --network ckan --restart always -d -v $DATA_DIR/solr-data:/opt/solr/server/solr/ckan/data ckan/solr
 
-docker run --name ckan-datapusher --network ckan --restart always -d -e SSL_VERIFY=False  -e MAX_CONTENT_LENGTH=102400005  -e DATAPUSHER_MAX_CONTENT_LENGTH=102400005 -p 8800:8800 -v $DATA_DIR/ckan-datapusher-data/datapusher_settings.py:/usr/src/app/deployment/datapusher_settings.py  keitaro/ckan-datapusher
+docker run --name ckan-datapusher --network ckan --restart always -d -e SSL_VERIFY=False  -e MAX_CONTENT_LENGTH=102400005  -e DATAPUSHER_MAX_CONTENT_LENGTH=102400005 -p 8800:8000 -v $DATA_DIR/ckan-datapusher-data/datapusher_settings.py:/usr/src/app/deployment/datapusher_settings.py  keitaro/ckan-datapusher
 
 docker run --name db --network ckan --restart always -d -v $DATA_DIR/ckan-db-data:/var/lib/postgresql/data ckan/postgresql
 
@@ -68,7 +68,7 @@ docker run --name ckan \
            -e CKAN_SQLALCHEMY_URL=postgresql://ckan:ckan@db/ckan \
            -e CKAN_DATASTORE_WRITE_URL=postgresql://ckan:ckan@ckan-datastore-db/datastore \
            -e CKAN_DATASTORE_READ_URL=postgresql://datastore_ro:ckan_ro@ckan-datastore-db/datastore \
-	   -e CKAN_DATAPUSHER_URL=http://ckan-datapusher:8800 \
+	   -e CKAN_DATAPUSHER_URL=http://ckan-datapusher:8000 \
 	   -e CKAN_DATAPUSHER_CALLBACK_URL_BASE=http://ckan:5000/ \
 	   -e CKAN_SOLR_URL=http://ckan-solr:8983/solr/ckan \
            -e CKAN_REDIS_URL=redis://ckan-redis:6379/1 \
